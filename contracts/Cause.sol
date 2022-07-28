@@ -16,9 +16,20 @@ contract Cause {
     //Custom Errors
     error Cause__IsNotOpenToDonations();
     error Cause__GoalAlreadyReached();
+    error Cause__OnlyCauseOwnerCanCall();
+    error Cause__ErrorWithdrawing();
 
     //Events
     event DonationMade(address indexed donor, uint256 amount);
+    event WithdrawalMade(address indexed withdrawer, uint256 amount);
+
+    modifier onlyOwner{
+        if(msg.sender!=s_causeOwner){
+            revert Cause__OnlyCauseOwnerCanCall();
+
+        }
+        _;
+    }
 
     //Constructor
     constructor(
@@ -58,5 +69,20 @@ contract Cause {
             s_isOpenToDonations = false;
         }
         emit DonationMade(msg.sender, msg.value);
+    }
+
+    function withdraw() public onlyOwner{
+        uint256 amount=address(this).balance;
+        bool success=payable(msg.sender).send(amount);
+        if(!success){
+            revert Cause__ErrorWithdrawing();
+
+
+        }
+        else{
+            s_isOpenToDonations=false;
+            emit WithdrawalMade(msg.sender, amount);
+        }
+
     }
 }
