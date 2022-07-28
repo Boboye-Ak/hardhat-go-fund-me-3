@@ -33,8 +33,15 @@ contract Cause {
     }
 
     //Receive and Fallback Functions
+    receive() external payable{
+        donate();
+    }
+    fallback() external payable{
+        donate();
+    }
 
     //Pure functions
+    //Donate Function
     function donate() public payable {
         if (s_isGoalReached) {
             revert Cause__GoalAlreadyReached();
