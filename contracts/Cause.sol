@@ -81,6 +81,7 @@ contract Cause {
         }
         else{
             s_isOpenToDonations=false;
+            s_causeBalance=0;
             emit WithdrawalMade(msg.sender, amount);
         }
 
