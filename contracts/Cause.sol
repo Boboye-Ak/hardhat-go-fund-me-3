@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 
-
 contract Cause {
     //State Variables
     uint256 public s_causeBalance;
@@ -23,10 +22,9 @@ contract Cause {
     event DonationMade(address indexed donor, uint256 amount);
     event WithdrawalMade(address indexed withdrawer, uint256 amount);
 
-    modifier onlyOwner{
-        if(msg.sender!=s_causeOwner){
+    modifier onlyOwner() {
+        if (msg.sender != s_causeOwner) {
             revert Cause__OnlyCauseOwnerCanCall();
-
         }
         _;
     }
@@ -44,14 +42,15 @@ contract Cause {
     }
 
     //Receive and Fallback Functions
-    receive() external payable{
-        donate();
-    }
-    fallback() external payable{
+    receive() external payable {
         donate();
     }
 
-    //Pure functions
+    fallback() external payable {
+        donate();
+    }
+
+    //PURE FUNCTIONS
     //Donate Function
     function donate() public payable {
         if (s_isGoalReached) {
@@ -71,19 +70,29 @@ contract Cause {
         emit DonationMade(msg.sender, msg.value);
     }
 
-    function withdraw() public onlyOwner{
-        uint256 amount=address(this).balance;
-        bool success=payable(msg.sender).send(amount);
-        if(!success){
+    //Withdraw Function
+    function withdraw() public onlyOwner {
+        uint256 amount = address(this).balance;
+        bool success = payable(msg.sender).send(amount);
+        if (!success) {
             revert Cause__ErrorWithdrawing();
-
-
-        }
-        else{
-            s_isOpenToDonations=false;
-            s_causeBalance=0;
+        } else {
+            s_isOpenToDonations = false;
+            s_causeBalance = 0;
             emit WithdrawalMade(msg.sender, amount);
         }
+    }
 
+    //VIEW FUNCTIONS
+    function getCauseBalance() public view returns (uint256) {
+        return s_causeBalance;
+    }
+
+    function getGoal() public view returns (uint256) {
+        return i_goal;
+    }
+
+    function getCauseName() public view returns (string memory) {
+        return s_causeName;
     }
 }
