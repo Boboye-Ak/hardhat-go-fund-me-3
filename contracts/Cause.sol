@@ -5,10 +5,13 @@ contract Cause {
     //State Variables
     uint256 public s_causeBalance;
     uint256 public immutable i_goal;
+    uint256 public immutable i_percentCut;
+    uint256 public immutable i_causeId;
     bool public s_isGoalReached;
     bool public s_isOpenToDonations;
     bool internal s_isWithdrawn;
     address public s_causeOwner;
+    address public s_causeCreatorContract;
     string public s_causeName;
     mapping(address => uint256) public donorToAmountDonated;
     address[] public donorList;
@@ -23,6 +26,8 @@ contract Cause {
     //Events
     event DonationMade(address indexed donor, uint256 amount);
     event WithdrawalMade(address indexed withdrawer, uint256 amount);
+    event IsOpenToDonationsSwitched(bool isOpenToDonations);
+    event OwnershipChanged(address indexed newOwner);
 
     modifier onlyOwner() {
         if (msg.sender != s_causeOwner) {
@@ -35,12 +40,17 @@ contract Cause {
     constructor(
         string memory causeName,
         uint256 goal,
-        address payable causeOwner
+        address payable causeOwner,
+        uint256 percentCut,
+        uint256 causeId
     ) {
+        s_causeCreatorContract = msg.sender;
         s_causeName = causeName;
         s_causeOwner = causeOwner;
         i_goal = goal;
         s_isOpenToDonations = true;
+        i_percentCut = percentCut;
+        i_causeId=causeId;
     }
 
     //Receive and Fallback Functions
@@ -75,33 +85,42 @@ contract Cause {
     //Withdraw Function
     function withdraw() public onlyOwner {
         uint256 amount = address(this).balance;
-        bool success = payable(msg.sender).send(amount);
-        if (!success) {
+        uint256 parentContractCut = ((amount * i_percentCut) / 10000);
+        bool paymentToParentSuccess = payable(s_causeCreatorContract).send(
+            parentContractCut
+        );
+        if (!paymentToParentSuccess) {
+            revert Cause__ErrorWithdrawing();
+        }
+        bool withdrawalSuccess = payable(msg.sender).send(
+            address(this).balance
+        );
+        if (!withdrawalSuccess) {
             revert Cause__ErrorWithdrawing();
         } else {
             s_isOpenToDonations = false;
             s_causeBalance = 0;
-            s_isWithdrawn=true;
+            s_isWithdrawn = true;
             emit WithdrawalMade(msg.sender, amount);
         }
     }
 
     function changeOwnership(address payable newOwner) public onlyOwner {
         s_causeOwner = newOwner;
+        emit OwnershipChanged(newOwner);
     }
-    function switchIsOpenToDonations() public onlyOwner{
-        if(s_isOpenToDonations){
-            s_isOpenToDonations=false;
 
-        }else{
-            if(s_isWithdrawn){
+    function switchIsOpenToDonations() public onlyOwner {
+        if (s_isOpenToDonations) {
+            s_isOpenToDonations = false;
+        } else {
+            if (s_isWithdrawn) {
                 revert Cause__CannotOpenToDonationsAfterWithdrawal();
-
-            }else{
-                s_isOpenToDonations=true;
+            } else {
+                s_isOpenToDonations = true;
             }
-
         }
+        emit IsOpenToDonationsSwitched(s_isOpenToDonations);
     }
 
     //VIEW FUNCTIONS
