@@ -10,7 +10,7 @@ contract CrowdFunder {
     mapping(address => uint256) public hasCause;
     uint256 public immutable i_percentCut;
     uint256 public s_nextCauseId;
-    Cause[] public s_causes;
+    Cause [] public s_causes;
 
     //CUSTOM ERRORS
     error CrowdFunder__OnlyOwnerCanCallThis();
@@ -23,7 +23,7 @@ contract CrowdFunder {
 
     //MODIFIERS
     modifier onlyOwner() {
-        if (msg.sender == i_crowdFunderOwner) {
+        if (msg.sender != i_crowdFunderOwner) {
             revert CrowdFunder__OnlyOwnerCanCallThis();
         }
         _;
@@ -70,7 +70,7 @@ contract CrowdFunder {
         if (!success) {
             revert CrowdFunder__ErrorWithdrawing();
         }
-        
+
     }
 
     //VIEW FUNCTIONS
