@@ -83,6 +83,12 @@ contract Cause {
         }
     }
 
+    function changeOwnership(address payable newOwner) public onlyOwner{
+        s_causeOwner=newOwner;
+
+
+    }
+
     //VIEW FUNCTIONS
     function getCauseBalance() public view returns (uint256) {
         return s_causeBalance;
@@ -94,5 +100,8 @@ contract Cause {
 
     function getCauseName() public view returns (string memory) {
         return s_causeName;
+    }
+    function getCauseOwner() public view returns(address){
+        return s_causeOwner;
     }
 }
