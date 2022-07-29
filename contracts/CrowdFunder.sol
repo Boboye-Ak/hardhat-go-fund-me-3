@@ -7,7 +7,7 @@ contract CrowdFunder {
     //STATE VARIABLES
     address payable public immutable i_crowdFunderOwner;
     mapping(address => address) public walletToCauseOwned;
-    mapping(address => bool) public hasCause;
+    mapping(address => uint256) public hasCause;
     uint256 public immutable i_percentCut;
     uint256 public s_nextCauseId;
     Cause[] public s_causes;
@@ -31,7 +31,7 @@ contract CrowdFunder {
     constructor(uint256 percentCut) {
         i_crowdFunderOwner = payable(msg.sender);
         i_percentCut = percentCut;
-        s_nextCauseId = 0;
+        s_nextCauseId = 1;
     }
 
     //RECEIVE AND FALLBACK FUNCTIONS
@@ -46,7 +46,7 @@ contract CrowdFunder {
     //PURE FUNCTIONS
     //Create Cause Function
     function createCause(string memory causeName, uint256 goal) public {
-        if (hasCause[msg.sender]) {
+        if (hasCause[msg.sender]!=0) {
             revert CrowdFunder__ThisAddressAlreadyHasACause();
         }
         Cause newCause = new Cause(
