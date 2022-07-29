@@ -14,7 +14,7 @@ contract CrowdFunder {
 
     //CUSTOM ERRORS
     error CrowdFunder__OnlyOwnerCanCallThis();
-    error CrowdFunder__ThisAddressAlreadyHasACause();
+    error CrowdFunder__ThisWalletAlreadyHasACause();
 
     //EVENTS
     event DonationReceived(uint256 indexed amount);
@@ -46,8 +46,8 @@ contract CrowdFunder {
     //PURE FUNCTIONS
     //Create Cause Function
     function createCause(string memory causeName, uint256 goal) public {
-        if (hasCause[msg.sender]!=0) {
-            revert CrowdFunder__ThisAddressAlreadyHasACause();
+        if (hasCause[msg.sender] != 0) {
+            revert CrowdFunder__ThisWalletAlreadyHasACause();
         }
         Cause newCause = new Cause(
             causeName,
@@ -57,18 +57,23 @@ contract CrowdFunder {
             s_nextCauseId
         );
         s_causes.push(newCause);
-        s_nextCauseId = s_nextCauseId + 1;
         walletToCauseOwned[msg.sender] = address(newCause);
-        hasCause[msg.sender]=true;
+        hasCause[msg.sender] = s_nextCauseId;
+        s_nextCauseId = s_nextCauseId + 1;
     }
 
-
-
-
     //VIEW FUNCTIONS
-    function getCause(uint256 causeId)public view returns(address){
-        address causeAddress=address(s_causes[causeId]);
+    function getCauseById(uint256 causeId) public view returns (address) {
+        address causeAddress = address(s_causes[causeId]);
         return causeAddress;
+    }
 
+    function getCauseByOwnerWallet(address owner)
+        public
+        view
+        returns (address)
+    {
+        address causeAddress = walletToCauseOwned[owner];
+        return causeAddress;
     }
 }
