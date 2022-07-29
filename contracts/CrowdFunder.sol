@@ -61,4 +61,14 @@ contract CrowdFunder {
         walletToCauseOwned[msg.sender] = address(newCause);
         hasCause[msg.sender]=true;
     }
+
+
+
+
+    //VIEW FUNCTIONS
+    function getCause(uint256 causeId)public view returns(address){
+        address causeAddress=address(s_causes[causeId]);
+        return causeAddress;
+
+    }
 }
