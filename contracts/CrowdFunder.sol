@@ -15,9 +15,11 @@ contract CrowdFunder {
     //CUSTOM ERRORS
     error CrowdFunder__OnlyOwnerCanCallThis();
     error CrowdFunder__ThisWalletAlreadyHasACause();
+    error CrowdFunder__ErrorWithdrawing();
 
     //EVENTS
     event DonationReceived(uint256 indexed amount);
+    event WithdrawalMade(uint256 indexed amount);
 
     //MODIFIERS
     modifier onlyOwner() {
@@ -62,6 +64,15 @@ contract CrowdFunder {
         s_nextCauseId = s_nextCauseId + 1;
     }
 
+    function withdraw() public payable onlyOwner {
+        uint256 amount = address(this).balance;
+        bool success = payable(msg.sender).send(amount);
+        if (!success) {
+            revert CrowdFunder__ErrorWithdrawing();
+        }
+        
+    }
+
     //VIEW FUNCTIONS
     function getCauseById(uint256 causeId) public view returns (address) {
         address causeAddress = address(s_causes[causeId]);
@@ -75,5 +86,9 @@ contract CrowdFunder {
     {
         address causeAddress = walletToCauseOwned[owner];
         return causeAddress;
+    }
+
+    function getContractBalance() public view returns (uint256) {
+        return address(this).balance;
     }
 }
