@@ -7,6 +7,7 @@ contract Cause {
     uint256 public immutable i_goal;
     bool public s_isGoalReached;
     bool public s_isOpenToDonations;
+    bool internal s_isWithdrawn;
     address public s_causeOwner;
     string public s_causeName;
     mapping(address => uint256) public donorToAmountDonated;
@@ -17,6 +18,7 @@ contract Cause {
     error Cause__GoalAlreadyReached();
     error Cause__OnlyCauseOwnerCanCall();
     error Cause__ErrorWithdrawing();
+    error Cause__CannotOpenToDonationsAfterWithdrawal();
 
     //Events
     event DonationMade(address indexed donor, uint256 amount);
@@ -79,14 +81,24 @@ contract Cause {
         } else {
             s_isOpenToDonations = false;
             s_causeBalance = 0;
+            s_isWithdrawn=true;
             emit WithdrawalMade(msg.sender, amount);
         }
     }
 
-    function changeOwnership(address payable newOwner) public onlyOwner{
-        s_causeOwner=newOwner;
+    function changeOwnership(address payable newOwner) public onlyOwner {
+        s_causeOwner = newOwner;
+    }
+    function switchIsOpenToDonations() public onlyOwner{
+        if(s_isOpenToDonations){
+            s_isOpenToDonations=false;
 
+        }else{
+            if(s_isWithdrawn){
+                revert Cause__CannotOpenToDonationsAfterWithdrawal();
 
+            }
+        }
     }
 
     //VIEW FUNCTIONS
@@ -101,7 +113,16 @@ contract Cause {
     function getCauseName() public view returns (string memory) {
         return s_causeName;
     }
-    function getCauseOwner() public view returns(address){
+
+    function getCauseOwner() public view returns (address) {
         return s_causeOwner;
+    }
+
+    function getIsGoalReached() public view returns (bool) {
+        return s_isGoalReached;
+    }
+
+    function getIsOpenToDonations() public view returns (bool) {
+        return s_isOpenToDonations;
     }
 }
