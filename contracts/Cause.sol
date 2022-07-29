@@ -97,7 +97,10 @@ contract Cause {
             if(s_isWithdrawn){
                 revert Cause__CannotOpenToDonationsAfterWithdrawal();
 
+            }else{
+                s_isOpenToDonations=true;
             }
+
         }
     }
 
