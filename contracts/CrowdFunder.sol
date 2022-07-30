@@ -10,7 +10,7 @@ contract CrowdFunder {
     mapping(address => uint256) public hasCause;
     uint256 public immutable i_percentCut;
     uint256 public s_nextCauseId;
-    Cause [] public s_causes;
+    Cause[] public s_causes;
 
     //CUSTOM ERRORS
     error CrowdFunder__OnlyOwnerCanCallThis();
@@ -30,7 +30,9 @@ contract CrowdFunder {
     }
 
     //CONSTRUCTOR
-    constructor(uint256 percentCut) {
+    constructor(
+        uint256 percentCut /*Percentage given in Basis Points ie 100 basis points=1% */
+    ) {
         i_crowdFunderOwner = payable(msg.sender);
         i_percentCut = percentCut;
         s_nextCauseId = 1;
@@ -70,12 +72,11 @@ contract CrowdFunder {
         if (!success) {
             revert CrowdFunder__ErrorWithdrawing();
         }
-
     }
 
     //VIEW FUNCTIONS
     function getCauseById(uint256 causeId) public view returns (address) {
-        address causeAddress = address(s_causes[causeId-1]);
+        address causeAddress = address(s_causes[causeId - 1]);
         return causeAddress;
     }
 

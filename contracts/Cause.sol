@@ -13,6 +13,7 @@ contract Cause {
     address public s_causeOwner;
     address public s_causeCreatorContract;
     string public s_causeName;
+    string public s_causeURI;
     mapping(address => uint256) public donorToAmountDonated;
     address[] public donorList;
 
@@ -28,6 +29,7 @@ contract Cause {
     event WithdrawalMade(address indexed withdrawer, uint256 amount);
     event IsOpenToDonationsSwitched(bool isOpenToDonations);
     event OwnershipChanged(address indexed newOwner);
+    event CauseURISet(string causeURI);
 
     modifier onlyOwner() {
         if (msg.sender != s_causeOwner) {
@@ -123,6 +125,12 @@ contract Cause {
         emit IsOpenToDonationsSwitched(s_isOpenToDonations);
     }
 
+    function setCauseURI(
+        string memory causeURI /* Will be the URI of an IPFS Json file  */
+    ) public onlyOwner {
+        s_causeURI = causeURI;
+    }
+
     //VIEW FUNCTIONS
     function getCauseBalance() public view returns (uint256) {
         return s_causeBalance;
@@ -146,5 +154,9 @@ contract Cause {
 
     function getIsOpenToDonations() public view returns (bool) {
         return s_isOpenToDonations;
+    }
+
+    function getCauseUri() public view returns (string memory) {
+        return s_causeURI;
     }
 }
