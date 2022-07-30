@@ -75,7 +75,7 @@ contract CrowdFunder {
 
     //VIEW FUNCTIONS
     function getCauseById(uint256 causeId) public view returns (address) {
-        address causeAddress = address(s_causes[causeId]);
+        address causeAddress = address(s_causes[causeId-1]);
         return causeAddress;
     }
 

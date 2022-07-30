@@ -50,7 +50,7 @@ contract Cause {
         i_goal = goal;
         s_isOpenToDonations = true;
         i_percentCut = percentCut;
-        i_causeId=causeId;
+        i_causeId = causeId;
     }
 
     //Receive and Fallback Functions
