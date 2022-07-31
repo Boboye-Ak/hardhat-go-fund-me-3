@@ -15,6 +15,7 @@ module.exports = async (hre) => {
     log: true,
     waitConfirmations: network.config.blockCondirmations || 1,
   })
+  log(`CrowdFunder address is ${crowdFunder.address}`)
   if (
     !developmentChains.includes(network.name) &&
     process.env.ETHERSCAN_API_KEY

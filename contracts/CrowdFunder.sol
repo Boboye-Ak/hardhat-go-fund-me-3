@@ -18,6 +18,7 @@ contract CrowdFunder {
     error CrowdFunder__ErrorWithdrawing();
 
     //EVENTS
+    event CauseCreated(address indexed causeAddress);
     event DonationReceived(uint256 indexed amount);
     event WithdrawalMade(uint256 indexed amount);
 
@@ -49,7 +50,10 @@ contract CrowdFunder {
 
     //PURE FUNCTIONS
     //Create Cause Function
-    function createCause(string memory causeName, uint256 goal) public {
+    function createCause(string memory causeName, uint256 goal)
+        public
+        returns (address)
+    {
         if (hasCause[msg.sender] != 0) {
             revert CrowdFunder__ThisWalletAlreadyHasACause();
         }
@@ -64,6 +68,8 @@ contract CrowdFunder {
         walletToCauseOwned[msg.sender] = address(newCause);
         hasCause[msg.sender] = s_nextCauseId;
         s_nextCauseId = s_nextCauseId + 1;
+        emit CauseCreated(address(newCause));
+        return address(newCause);
     }
 
     function sponsorSite() public payable {
