@@ -66,6 +66,11 @@ contract CrowdFunder {
         s_nextCauseId = s_nextCauseId + 1;
     }
 
+    function sponsorSite() public payable {
+        emit DonationReceived(msg.value);
+    }
+
+    //Withdraw Function
     function withdraw() public payable onlyOwner {
         uint256 amount = address(this).balance;
         bool success = payable(msg.sender).send(amount);
@@ -80,13 +85,19 @@ contract CrowdFunder {
         return causeAddress;
     }
 
-    function getCauseByOwnerWallet(address owner)
+    function getCauseAddressByOwnerWallet(address owner)
         public
         view
         returns (address)
     {
         address causeAddress = walletToCauseOwned[owner];
         return causeAddress;
+    }
+
+    function getMyCause() public view returns (uint256, address) {
+        address causeAddress = getCauseAddressByOwnerWallet(msg.sender);
+        uint256 causeId = hasCause[msg.sender];
+        return (causeId, causeAddress);
     }
 
     function getContractBalance() public view returns (uint256) {
