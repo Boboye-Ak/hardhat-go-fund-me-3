@@ -9,6 +9,7 @@ contract Cause {
     uint256 public immutable i_causeId;
     bool public s_isGoalReached;
     bool public s_isOpenToDonations;
+    bool public s_isBlocked;
     bool internal s_isWithdrawn;
     address public s_causeOwner;
     address public s_causeCreatorContract;
@@ -23,6 +24,10 @@ contract Cause {
     error Cause__OnlyCauseOwnerCanCall();
     error Cause__ErrorWithdrawing();
     error Cause__CannotOpenToDonationsAfterWithdrawal();
+    error Cause__IsBlocked();
+    error Cause__IsBlockedAlready();
+    error Cause__IsUnblockedAlready();
+    error Cause__OnlyCreatorContractCanCall();
 
     //Events
     event DonationMade(address indexed donor, uint256 amount);
@@ -34,6 +39,13 @@ contract Cause {
     modifier onlyOwner() {
         if (msg.sender != s_causeOwner) {
             revert Cause__OnlyCauseOwnerCanCall();
+        }
+        _;
+    }
+
+    modifier onlyParentContract() {
+        if (msg.sender != s_causeCreatorContract) {
+            revert Cause__OnlyCreatorContractCanCall();
         }
         _;
     }
@@ -73,6 +85,9 @@ contract Cause {
         if (!s_isOpenToDonations) {
             revert Cause__IsNotOpenToDonations();
         }
+        if (s_isBlocked) {
+            revert Cause__IsBlocked();
+        }
 
         s_causeBalance += msg.value;
         donorList.push(msg.sender);
@@ -86,6 +101,9 @@ contract Cause {
 
     //Withdraw Function
     function withdraw() public onlyOwner {
+        if (s_isBlocked) {
+            revert Cause__IsBlocked();
+        }
         uint256 amount = address(this).balance;
         uint256 parentContractCut = ((amount * i_percentCut) / 10000);
         bool paymentToParentSuccess = payable(s_causeCreatorContract).send(
@@ -108,6 +126,9 @@ contract Cause {
     }
 
     function changeOwnership(address payable newOwner) public onlyOwner {
+        if (s_isBlocked) {
+            revert Cause__IsBlocked();
+        }
         s_causeOwner = newOwner;
         emit OwnershipChanged(newOwner);
     }
@@ -128,7 +149,24 @@ contract Cause {
     function setCauseURI(
         string memory causeURI /* Will be the URI of an IPFS Json file  */
     ) public onlyOwner {
+        if (s_isBlocked) {
+            revert Cause__IsBlocked();
+        }
         s_causeURI = causeURI;
+    }
+
+    function lock() public onlyParentContract {
+        if (s_isBlocked) {
+            revert Cause__IsBlockedAlready();
+        }
+        s_isBlocked = true;
+    }
+
+    function unlock() public onlyParentContract {
+        if (!s_isBlocked) {
+            revert Cause__IsUnblockedAlready();
+        }
+        s_isBlocked = false;
     }
 
     //VIEW FUNCTIONS
