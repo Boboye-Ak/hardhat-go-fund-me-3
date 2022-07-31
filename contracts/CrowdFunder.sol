@@ -85,6 +85,17 @@ contract CrowdFunder {
         }
     }
 
+    //Block Cause Function
+    function lock(uint256 causeId) public onlyOwner {
+        Cause cause = s_causes[causeId - 1];
+        cause.lock();
+    }
+
+    function unlock(uint256 causeId) public onlyOwner {
+        Cause cause = s_causes[causeId - 1];
+        cause.unlock();
+    }
+
     //VIEW FUNCTIONS
     function getCauseById(uint256 causeId) public view returns (address) {
         address causeAddress = address(s_causes[causeId - 1]);
