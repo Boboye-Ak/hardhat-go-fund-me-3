@@ -105,12 +105,21 @@ contract CrowdFunder {
         uint256 causeId = hasCause[msg.sender];
         return (causeId, causeAddress);
     }
-    function getLatestCauseAddress() public view returns(address){
-        address latestCauseAddress=address(s_causes[s_nextCauseId-2]);
+
+    function getLatestCauseAddress() public view returns (address) {
+        address latestCauseAddress = address(s_causes[s_nextCauseId - 2]);
         return latestCauseAddress;
     }
 
     function getContractBalance() public view returns (uint256) {
         return address(this).balance;
+    }
+
+    function getContractOwner() public view returns (address) {
+        return i_crowdFunderOwner;
+    }
+
+    function getPercentCut() public view returns (uint256) {
+        return i_percentCut;
     }
 }
