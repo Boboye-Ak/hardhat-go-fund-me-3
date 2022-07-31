@@ -10,6 +10,8 @@ const {
   : describe("CrowdFunder", () => {
       let crowdFunder, deployer
       const chainId = network.config.chainId
+      const causeName="My Cause Name"
+      const goal=networkConfig[chainId]["goal"]
       beforeEach(async () => {
         deployer = (await getNamedAccounts()).deployer
         await deployments.fixture(["crowd-funder"])
@@ -23,6 +25,11 @@ const {
           assert.equal(deployer, contractOwner)
           assert.equal(networkConfig[chainId]["percentCut"], percentCut)
           assert.equal("1", nextCauseId.toString())
+        })
+      })
+      describe("createCause", ()=>{
+        beforeEach(async()=>{
+            await crowdFunder.createCause(causeName, goal )
         })
       })
     })
