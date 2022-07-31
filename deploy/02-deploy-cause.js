@@ -26,15 +26,15 @@ module.exports = async (hre) => {
   args = [causeName, goal]
   const transactionResponse = await causeOwnerCrowdFunder.createCause(causeName, goal)
   const transactionReceipt=await transactionResponse.wait(1)
-  const latestCause=await causeOwnerCrowdFunder.getCauseById(causeId)
-  log(`New Cause deployed at ${latestCause}`)
+  const latestCause=await causeOwnerCrowdFunder.getLatestCauseAddress()
+  log(`New Cause deployed at ${latestCause} with ${transactionReceipt.gasUsed} gas used`)
 
   if (
     !developmentChains.includes(network.name) &&
     process.env.ETHERSCAN_API_KEY
   ) {
     console.log("Verifying...")
-    await verify(transactionResponse, constructorArgs)
+    await verify(latestCause, constructorArgs)
   }
   log("----------------------------- ")
 }
