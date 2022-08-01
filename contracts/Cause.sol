@@ -65,6 +65,7 @@ contract Cause {
         s_isOpenToDonations = true;
         i_percentCut = percentCut;
         i_causeId = causeId;
+        s_isBlocked=true;
     }
 
     //Receive and Fallback Functions

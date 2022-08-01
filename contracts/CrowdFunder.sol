@@ -64,6 +64,7 @@ contract CrowdFunder {
             i_percentCut,
             s_nextCauseId
         );
+        newCause.unlock();
         s_causes.push(newCause);
         walletToCauseOwned[msg.sender] = address(newCause);
         hasCause[msg.sender] = s_nextCauseId;
