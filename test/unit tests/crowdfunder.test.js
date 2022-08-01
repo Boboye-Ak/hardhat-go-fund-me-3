@@ -29,17 +29,39 @@ const {
         })
       })
       describe("createCause", () => {
-        let signer, signerCrowdFunder
+        let signer, signerCrowdFunder, causeABI
         beforeEach(async () => {
           signer = (await ethers.getSigners())[1]
           signerCrowdFunder = crowdFunder.connect(signer)
           await signerCrowdFunder.createCause(causeName, goal)
-          const causeABI = await hre.artifacts.readArtifact("Cause").abi
+          causeABI = (await hre.artifacts.readArtifact("Cause")).abi
         })
         it("doesn't allow multiple cause creation by same wallet", async () => {
           await expect(
             signerCrowdFunder.createCause(causeName, goal)
           ).to.be.revertedWith("CrowdFunder__ThisWalletAlreadyHasACause")
+        })
+        it("Initializes cause contract properly", async () => {
+          //get latest cause contract
+          const latestCauseAddress = await crowdFunder.getLatestCauseAddress()
+          const latestCause = new ethers.Contract(
+            latestCauseAddress,
+            causeABI,
+            signer
+          )
+          const expectedCauseCreatorContractAddress = await crowdFunder.address
+          const causeCreatorContractAddress =
+            await latestCause.s_causeCreatorContract()
+          const expectedCauseName = await latestCause.s_causeName()
+          const causeOwner = await latestCause.s_causeOwner()
+          const expectedGoal = await latestCause.i_goal()
+          assert.equal(expectedCauseName, causeName)
+          assert.equal(causeOwner, signer.address)
+          assert.equal(goal, expectedGoal.toString())
+          assert.equal(
+            expectedCauseCreatorContractAddress,
+            causeCreatorContractAddress
+          )
         })
       })
     })
