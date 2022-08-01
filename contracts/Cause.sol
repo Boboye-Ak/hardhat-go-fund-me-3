@@ -67,7 +67,7 @@ contract Cause {
         s_isOpenToDonations = true;
         i_percentCut = percentCut;
         i_causeId = causeId;
-        s_isBlocked=true;
+        s_isBlocked = true;
     }
 
     //Receive and Fallback Functions
@@ -109,15 +109,11 @@ contract Cause {
         }
         uint256 amount = address(this).balance;
         uint256 parentContractCut = ((amount * i_percentCut) / 10000);
-        bool paymentToParentSuccess = payable(s_causeCreatorContract).send(
-            parentContractCut
-        );
+        bool paymentToParentSuccess = payable(s_causeCreatorContract).send(parentContractCut);
         if (!paymentToParentSuccess) {
             revert Cause__ErrorWithdrawing();
         }
-        bool withdrawalSuccess = payable(msg.sender).send(
-            address(this).balance
-        );
+        bool withdrawalSuccess = payable(msg.sender).send(address(this).balance);
         if (!withdrawalSuccess) {
             revert Cause__ErrorWithdrawing();
         } else {

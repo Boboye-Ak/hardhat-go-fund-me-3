@@ -50,10 +50,7 @@ contract CrowdFunder {
 
     //PURE FUNCTIONS
     //Create Cause Function
-    function createCause(string memory causeName, uint256 goal)
-        public
-        returns (address)
-    {
+    function createCause(string memory causeName, uint256 goal) public returns (address) {
         if (hasCause[msg.sender] != 0) {
             revert CrowdFunder__ThisWalletAlreadyHasACause();
         }
@@ -103,11 +100,7 @@ contract CrowdFunder {
         return causeAddress;
     }
 
-    function getCauseAddressByOwnerWallet(address owner)
-        public
-        view
-        returns (address)
-    {
+    function getCauseAddressByOwnerWallet(address owner) public view returns (address) {
         address causeAddress = walletToCauseOwned[owner];
         return causeAddress;
     }
