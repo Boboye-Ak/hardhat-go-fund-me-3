@@ -70,4 +70,17 @@ const {
           assert.equal(await crowdFunder.hasCause(signer.address), "1")
         })
       })
+      describe("sponsorSite", () => {
+        it("accepts donations", async () => {
+          await crowdFunder.sponsorSite({ value: ethers.utils.parseEther("0.1") })
+          const contractBalance = await crowdFunder.provider.getBalance(
+            crowdFunder.address
+          )
+          assert.equal(
+            ethers.utils.parseEther("0.1"),
+            contractBalance.toString()
+          )
+        })
+      })
+      describe("Withdraw", () => {})
     })
