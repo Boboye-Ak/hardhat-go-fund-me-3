@@ -156,6 +156,7 @@ contract Cause {
             revert Cause__IsBlocked();
         }
         s_causeURI = causeURI;
+        emit CauseURISet(s_causeURI);
     }
 
     function lock() public onlyParentContract {
