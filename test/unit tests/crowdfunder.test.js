@@ -72,7 +72,9 @@ const {
       })
       describe("sponsorSite", () => {
         it("accepts donations", async () => {
-          await crowdFunder.sponsorSite({ value: ethers.utils.parseEther("0.1") })
+          await crowdFunder.sponsorSite({
+            value: ethers.utils.parseEther("0.1"),
+          })
           const contractBalance = await crowdFunder.provider.getBalance(
             crowdFunder.address
           )
@@ -82,5 +84,32 @@ const {
           )
         })
       })
-      describe("Withdraw", () => {})
+      describe("Withdraw", () => {
+        beforeEach(async ()=>{
+            await crowdFunder.sponsorSite({
+                value: ethers.utils.parseEther("0.1"),
+              })
+            
+
+            
+
+        })
+        it("only allows the owner of the contract to call it", async () => {
+            const attacker=(await ethers.getSigners())[1]
+            const attackerCrowdFunder=await crowdFunder.connect(attacker)
+            await expect(attackerCrowdFunder.withdraw()).to.be.revertedWith("CrowdFunder__OnlyOwnerCanCallThis")
+        })
+        it("pays the balance of the contract to the owner", async () => {
+            const initialDeployerBalance=await crowdFunder.provider.getBalance(deployer)
+            const initialCrowdfunderBalance=await crowdFunder.provider.getBalance(crowdFunder.address)
+            const transactionResponse=await crowdFunder.withdraw()
+            const transactionReceipt=await transactionResponse.wait(1)
+            const { gasUsed, effectiveGasPrice } = transactionReceipt
+            const gasCost = gasUsed.mul(effectiveGasPrice)
+            const endingDeployerBalance=await crowdFunder.provider.getBalance(deployer)
+            const endingCrowdFunderBalance=await crowdFunder.provider.getBalance(crowdFunder.address)
+            assert(endingCrowdFunderBalance.toString(), "0")
+            assert(endingDeployerBalance.add(gasCost), initialCrowdfunderBalance.add(initialDeployerBalance))
+        })
+      })
     })
