@@ -134,4 +134,13 @@ contract CrowdFunder {
     function getPercentCut() public view returns (uint256) {
         return i_percentCut;
     }
+
+    function confirmCause(address causeToCheck) public view returns (bool) {
+        /*Returns true if the Cause is truly deployed by this contract */
+        if (hasCause[causeToCheck] != 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
