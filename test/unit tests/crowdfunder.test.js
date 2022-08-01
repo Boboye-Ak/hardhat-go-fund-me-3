@@ -63,5 +63,11 @@ const {
             causeCreatorContractAddress
           )
         })
+        it("Updates state variables", async () => {
+          const latestCauseAddress = await crowdFunder.getLatestCauseAddress()
+          assert.equal((await crowdFunder.s_nextCauseId()).toString(), "2")
+          assert.equal(await crowdFunder.s_causes(0), latestCauseAddress)
+          assert.equal(await crowdFunder.hasCause(signer.address), "1")
+        })
       })
     })
