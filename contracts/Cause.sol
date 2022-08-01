@@ -35,6 +35,8 @@ contract Cause {
     event IsOpenToDonationsSwitched(bool isOpenToDonations);
     event OwnershipChanged(address indexed newOwner);
     event CauseURISet(string causeURI);
+    event CauseLocked(bool isLocked);
+    event CauseUnlocked(bool isLocked);
 
     modifier onlyOwner() {
         if (msg.sender != s_causeOwner) {
@@ -161,6 +163,7 @@ contract Cause {
             revert Cause__IsBlockedAlready();
         }
         s_isBlocked = true;
+        emit CauseLocked(s_isBlocked);
     }
 
     function unlock() public onlyParentContract {
@@ -168,6 +171,7 @@ contract Cause {
             revert Cause__IsUnblockedAlready();
         }
         s_isBlocked = false;
+        emit CauseUnlocked(s_isBlocked);
     }
 
     //VIEW FUNCTIONS
