@@ -69,7 +69,7 @@ const { deploy, log } = deployments
                   assert.equal(ethers.utils.parseEther("0.1"), contractBalance.toString())
               })
           })
-          describe("Withdraw", () => {
+          describe("CrowdFunder Withdraw", () => {
               beforeEach(async () => {
                   await crowdFunder.sponsorSite({
                       value: ethers.utils.parseEther("0.1"),
@@ -95,10 +95,10 @@ const { deploy, log } = deployments
                   const endingCrowdFunderBalance = await crowdFunder.provider.getBalance(
                       crowdFunder.address
                   )
-                  assert(endingCrowdFunderBalance.toString(), "0")
-                  assert(
-                      endingDeployerBalance.add(gasCost),
-                      initialCrowdfunderBalance.add(initialDeployerBalance)
+                  assert.equal(endingCrowdFunderBalance.toString(), "0")
+                  assert.equal(
+                      endingDeployerBalance.add(gasCost).toString(),
+                      initialCrowdfunderBalance.add(initialDeployerBalance).toString()
                   )
               })
           })
