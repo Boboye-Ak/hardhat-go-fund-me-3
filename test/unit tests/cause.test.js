@@ -90,5 +90,12 @@ const { deploy, log } = deployments
                   assert.equal(finalCauseBalance.toString(), "0")
                   assert.isAbove(finalCreatorContractBalance, initialCreatorContractBalance)
               })
+              it("updates state variables after withdrawing", async () => {
+                  const txResponse = await latestCause.withdraw()
+                  assert.equal(await latestCause.s_causeBalance(), "0")
+                  assert.equal(await latestCause.s_isWithdrawn(), true)
+                  assert.equal(await latestCause.s_isOpenToDonations(), false)
+              })
           })
+          describe("", () => {})
       })

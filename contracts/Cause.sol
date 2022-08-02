@@ -10,7 +10,7 @@ contract Cause {
     bool public s_isGoalReached;
     bool public s_isOpenToDonations;
     bool public s_isBlocked;
-    bool internal s_isWithdrawn;
+    bool public s_isWithdrawn;
     address public s_causeOwner;
     address public s_causeCreatorContract;
     string public s_causeName;
