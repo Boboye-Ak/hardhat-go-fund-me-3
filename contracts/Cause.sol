@@ -188,6 +188,9 @@ contract Cause {
         }
         donorToAmountDonated[msg.sender] = 0;
         s_causeBalance = s_causeBalance - amount;
+        if (s_causeBalance < i_goal) {
+            s_isGoalReached = false;
+        }
         emit Refunded(msg.sender, amount);
     }
 
