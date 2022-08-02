@@ -129,4 +129,31 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
                   assert.equal(await latestCause.s_isBlocked(), false)
               })
           })
+          describe("View Functions", () => {
+              let signer,
+                  donor,
+                  signerCrowdFunder,
+                  latestCause,
+                  donorLatestCause,
+                  latestCauseAddress
+              beforeEach(async () => {
+                  signer = (await ethers.getSigners())[1]
+                  donor = (await ethers.getSigners())[2]
+                  signerCrowdFunder = crowdFunder.connect(signer)
+                  await signerCrowdFunder.createCause(causeName, goal)
+                  const causeABI = (await hre.artifacts.readArtifact("Cause")).abi
+                  latestCauseAddress = await crowdFunder.getLatestCauseAddress()
+                  latestCause = new ethers.Contract(latestCauseAddress, causeABI, signer)
+                  donorLatestCause = new ethers.Contract(latestCauseAddress, causeABI, donor)
+              })
+              it("gets cause address correctly by Id correctly", async () => {
+                  assert(await crowdFunder.getCauseById(1), latestCauseAddress)
+              })
+              it("gets cause address correctly by owner wallet", async()=>{
+                assert((await crowdFunder.getCauseAddressByOwnerWallet(signer.address)), latestCauseAddress)
+              })
+              it("gets cause address based on the sender address", async()=>{
+                assert((await signerCrowdFunder.getMyCause()), latestCauseAddress)
+              })
+          })
       })
