@@ -28,6 +28,8 @@ contract Cause {
     error Cause__IsBlockedAlready();
     error Cause__IsUnblockedAlready();
     error Cause__OnlyCreatorContractCanCall();
+    error Cause__CauseOwnerHasWithdrawnAlready();
+    error Cause__YouDoNotHaveAnyDonationToThisCause();
 
     //Events
     event DonationMade(address indexed donor, uint256 amount);
@@ -37,6 +39,7 @@ contract Cause {
     event CauseURISet(string causeURI);
     event CauseLocked(bool isLocked);
     event CauseUnlocked(bool isLocked);
+    event Refunded(address refundee, uint256 amount);
 
     modifier onlyOwner() {
         if (msg.sender != s_causeOwner) {
@@ -169,6 +172,23 @@ contract Cause {
         }
         s_isBlocked = false;
         emit CauseUnlocked(s_isBlocked);
+    }
+
+    function demandRefund() public payable {
+        if (s_isWithdrawn) {
+            revert Cause__CauseOwnerHasWithdrawnAlready();
+        }
+        if (donorToAmountDonated[msg.sender] == 0) {
+            revert Cause__YouDoNotHaveAnyDonationToThisCause();
+        }
+        uint256 amount = donorToAmountDonated[msg.sender];
+        bool success = payable(msg.sender).send(amount);
+        if (!success) {
+            revert Cause__ErrorWithdrawing();
+        }
+        donorToAmountDonated[msg.sender] = 0;
+        s_causeBalance = s_causeBalance - amount;
+        emit Refunded(msg.sender, amount);
     }
 
     //VIEW FUNCTIONS
