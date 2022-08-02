@@ -8,6 +8,7 @@ contract CrowdFunder {
     address payable public immutable i_crowdFunderOwner;
     mapping(address => address) public walletToCauseOwned;
     mapping(address => uint256) public hasCause;
+    mapping(address=>uint256) public causeToId;
     uint256 public immutable i_percentCut;
     uint256 public s_nextCauseId;
     Cause[] public s_causes;
@@ -65,6 +66,7 @@ contract CrowdFunder {
         s_causes.push(newCause);
         walletToCauseOwned[msg.sender] = address(newCause);
         hasCause[msg.sender] = s_nextCauseId;
+        causeToId[address(newCause)]=s_nextCauseId;
         s_nextCauseId = s_nextCauseId + 1;
         emit CauseCreated(address(newCause));
         return address(newCause);
@@ -130,7 +132,7 @@ contract CrowdFunder {
 
     function confirmCause(address causeToCheck) public view returns (bool) {
         /*Returns true if the Cause is truly deployed by this contract */
-        if (hasCause[causeToCheck] != 0) {
+        if (causeToId[causeToCheck] != 0) {
             return true;
         } else {
             return false;

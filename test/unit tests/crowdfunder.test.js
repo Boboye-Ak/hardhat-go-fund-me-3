@@ -2,6 +2,7 @@ const { assert, expect } = require("chai")
 const { network, getNamedAccounts, deployments, ethers } = require("hardhat")
 const hre = require("hardhat")
 const { developmentChains, networkConfig } = require("../../helper-hardhat-config")
+const { deploy, log } = deployments
 
 !developmentChains.includes(network.name)
     ? describe.skip
@@ -139,6 +140,7 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
               beforeEach(async () => {
                   signer = (await ethers.getSigners())[1]
                   donor = (await ethers.getSigners())[2]
+                  fraud = (await getNamedAccounts()).fraud
                   signerCrowdFunder = crowdFunder.connect(signer)
                   await signerCrowdFunder.createCause(causeName, goal)
                   const causeABI = (await hre.artifacts.readArtifact("Cause")).abi
@@ -149,11 +151,45 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
               it("gets cause address correctly by Id correctly", async () => {
                   assert(await crowdFunder.getCauseById(1), latestCauseAddress)
               })
-              it("gets cause address correctly by owner wallet", async()=>{
-                assert((await crowdFunder.getCauseAddressByOwnerWallet(signer.address)), latestCauseAddress)
+              it("gets cause address correctly by owner wallet", async () => {
+                  assert(
+                      await crowdFunder.getCauseAddressByOwnerWallet(signer.address),
+                      latestCauseAddress
+                  )
               })
-              it("gets cause address based on the sender address", async()=>{
-                assert((await signerCrowdFunder.getMyCause()), latestCauseAddress)
+              it("gets cause address based on the sender address", async () => {
+                  assert(await signerCrowdFunder.getMyCause(), latestCauseAddress)
+              })
+              it("gets contract balance correctly", async () => {
+                  await crowdFunder.sponsorSite({
+                      value: ethers.utils.parseEther("0.1"),
+                  })
+                  const contractBalance = await crowdFunder.provider.getBalance(crowdFunder.address)
+                  assert.equal(ethers.utils.parseEther("0.1"), contractBalance.toString())
+              })
+              it("gets contract owner correctly", async () => {
+                  assert.equal(await crowdFunder.getContractOwner(), deployer)
+              })
+              it("gets percent cut correctly", async () => {
+                  assert.equal(
+                      await crowdFunder.getPercentCut(),
+                      networkConfig[chainId]["percentCut"]
+                  )
+              })
+              describe("confirmCause", () => {
+                  it("does not confirm fraudulently deployed Cause", async () => {
+                      const fraudArgs = ["Fraud Cause", goal, fraud, "100", 1]
+                      const fraudCause = await deploy("Cause", {
+                          from: fraud,
+                          log: true,
+                          waitConfirmations: network.config.blockConfirmations || 1,
+                          args: fraudArgs,
+                      })
+                      assert.equal(await crowdFunder.confirmCause(fraudCause.address), false)
+                  })
+                  it("confirms legitimately deployed Causes", async () => {
+                      assert.equal(await crowdFunder.confirmCause(latestCauseAddress), true)
+                  })
               })
           })
       })

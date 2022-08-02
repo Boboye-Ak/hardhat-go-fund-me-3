@@ -13,7 +13,7 @@ module.exports = async (hre) => {
     from: deployer,
     args: args,
     log: true,
-    waitConfirmations: network.config.blockCondirmations || 1,
+    waitConfirmations: network.config.blockConfirmations || 1,
   })
   log(`CrowdFunder address is ${crowdFunder.address}`)
   if (
