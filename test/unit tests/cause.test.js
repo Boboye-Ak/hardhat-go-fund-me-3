@@ -135,9 +135,41 @@ const { deploy, log } = deployments
                       "Cause__IsBlocked"
                   )
               })
-              it("sets causeURI if everything is in order", async()=>{
-                await latestCause.setCauseURI(causeURI)
-                assert (await latestCause.s_causeURI(), causeURI)
+              it("sets causeURI if everything is in order", async () => {
+                  await latestCause.setCauseURI(causeURI)
+                  assert(await latestCause.s_causeURI(), causeURI)
+              })
+          })
+          describe("demandRefund", () => {
+              it("won't refund if cause has been withdrawn already", async () => {
+                  const donationValue = ethers.utils.parseEther("2.0")
+                  await donorLatestCause.donate({ value: donationValue })
+                  await latestCause.withdraw()
+                  await expect(donorLatestCause.demandRefund()).to.be.revertedWith(
+                      "Cause__CauseOwnerHasWithdrawnAlready"
+                  )
+              })
+              it("reverts if donor has not donation", async () => {
+                  await expect(donorLatestCause.demandRefund()).to.be.revertedWith(
+                      "Cause__YouDoNotHaveAnyDonationToThisCause"
+                  )
+              })
+              it("gives refund to donor that asks", async () => {
+                  const donationValue = ethers.utils.parseEther("2.0")
+                  await donorLatestCause.donate({ value: donationValue })
+                  const donorInitialBalance = await crowdFunder.provider.getBalance(donor.address)
+                  const donorInitialDonation = await latestCause.donorToAmountDonated(donor.address)
+                  const txResponse = await donorLatestCause.demandRefund()
+                  const txReceipt = await txResponse.wait(1)
+                  const { gasUsed, effectiveGasPrice } = txReceipt
+                  const gasCost = gasUsed.mul(effectiveGasPrice)
+                  const donorFinalBalance = await crowdFunder.provider.getBalance(donor.address)
+                  const donorFinalDonation = await latestCause.donorToAmountDonated(donor.address)
+                  assert.equal(
+                      donorInitialBalance.add(donorInitialDonation).toString(),
+                      donorFinalBalance.add(gasCost).toString()
+                  )
+                  assert.equal(donorFinalDonation, "0")
               })
           })
       })
