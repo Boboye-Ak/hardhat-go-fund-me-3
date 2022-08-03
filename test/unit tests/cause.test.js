@@ -103,4 +103,28 @@ const { deploy, log } = deployments
                   assert.equal(donor.address, await latestCause.s_causeOwner())
               })
           })
+          describe("switchIsOpenToDonations", () => {
+              it("won't allow nonOwner to close off donations", async () => {
+                  await expect(donorLatestCause.switchIsOpenToDonations()).to.be.revertedWith(
+                      "Cause__OnlyCauseOwnerCanCall"
+                  )
+              })
+              it("can close off donations if owner calls", async () => {
+                  await latestCause.switchIsOpenToDonations()
+                  assert.equal(await latestCause.s_isOpenToDonations(), false)
+              })
+              it("can open donations after closing", async () => {
+                  await latestCause.switchIsOpenToDonations()
+                  await latestCause.switchIsOpenToDonations()
+                  assert.equal(await latestCause.s_isOpenToDonations(), true)
+              })
+              it("can't reopen donations after withdrawal", async () => {
+                  const donationValue = ethers.utils.parseEther("2.0")
+                  await donorLatestCause.donate({ value: donationValue })
+                  await latestCause.withdraw()
+                  await expect(latestCause.switchIsOpenToDonations()).to.be.revertedWith(
+                      "Cause__CannotOpenToDonationsAfterWithdrawal"
+                  )
+              })
+          })
       })
