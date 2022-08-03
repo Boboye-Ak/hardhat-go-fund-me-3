@@ -127,4 +127,17 @@ const { deploy, log } = deployments
                   )
               })
           })
+          describe("setCauseURI", () => {
+              const causeURI = "test cause URI"
+              it("won't set causeURI if cause is locked", async () => {
+                  await crowdFunder.lock(1)
+                  await expect(latestCause.setCauseURI(causeURI)).to.be.revertedWith(
+                      "Cause__IsBlocked"
+                  )
+              })
+              it("sets causeURI if everything is in order", async()=>{
+                await latestCause.setCauseURI(causeURI)
+                assert (await latestCause.s_causeURI(), causeURI)
+              })
+          })
       })
