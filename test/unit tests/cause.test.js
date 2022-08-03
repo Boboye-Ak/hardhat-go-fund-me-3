@@ -97,5 +97,10 @@ const { deploy, log } = deployments
                   assert.equal(await latestCause.s_isOpenToDonations(), false)
               })
           })
-          describe("", () => {})
+          describe("changeOwnership", () => {
+              it("changes the owner of the cause when called", async () => {
+                  await latestCause.changeOwnership(donor.address)
+                  assert.equal(donor.address, await latestCause.s_causeOwner())
+              })
+          })
       })
