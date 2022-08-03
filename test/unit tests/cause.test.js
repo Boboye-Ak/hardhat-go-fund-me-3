@@ -172,4 +172,26 @@ const { deploy, log } = deployments
                   assert.equal(donorFinalDonation, "0")
               })
           })
+          describe("tests for view functions", ()=>{
+            it("gets cause balance", async()=>{
+                const donationValue = ethers.utils.parseEther("2.0")
+                await donorLatestCause.donate({ value: donationValue })
+                assert.equal((await latestCause.getCauseBalance()).toString(), donationValue)
+            })
+            it("gets goal", async()=>{
+                assert.equal((await latestCause.getGoal()).toString(), goal.toString())
+            })
+            it("gets Cause Name", async()=>{
+                assert.equal((await latestCause.getCauseName()), causeName)
+            })
+            it("gets Cause Owner", async()=>{
+                assert.equal((await latestCause.getCauseOwner()), signer.address)
+            })
+            it("gets Cause URI", async()=>{
+                const causeURI="test cause URI"
+                await latestCause.setCauseURI(causeURI)
+                assert.equal((await latestCause.getCauseURI()), causeURI)
+            })
+            
+          })
       })

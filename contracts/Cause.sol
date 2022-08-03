@@ -219,7 +219,7 @@ contract Cause {
         return s_isOpenToDonations;
     }
 
-    function getCauseUri() public view returns (string memory) {
+    function getCauseURI() public view returns (string memory) {
         return s_causeURI;
     }
 }
