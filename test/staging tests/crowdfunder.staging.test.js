@@ -38,7 +38,11 @@ developmentChains.includes(network.name)
               const causeInitialBalance = await latestCause.provider.getBalance(latestCause.address)
               const causeOwnerInitialBalance = await accounts[1].getBalance()
               //owner withdraws from cause
-              await latestCause.withdraw()
+              const txResponse = await latestCause.withdraw()
+              const txReceipt = await txResponse.wait(1)
+              const { gasUsed, effectiveGasPrice } = txReceipt
+              const gasCost = gasUsed.mul(effectiveGasPrice)
               const causeOwnerFinalBalance = await accounts[1].getBalance()
+              assert.equal(causeOwnerFinalBalance, causeInitialBalance.add(donationValue.mul("3")))
           })
       })
