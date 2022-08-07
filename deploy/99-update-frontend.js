@@ -20,7 +20,7 @@ const updateAddresses = async () => {
             currentAddresses[chainId].push(crowdFunder.address)
         }
     }
-    currentAddresses.chainId = [crowdFunder.address]
+    currentAddresses[chainId] = [crowdFunder.address]
     fs.writeFileSync(CROWD_FUNDER_ADDRESSES_FILE, JSON.stringify(currentAddresses))
 }
 const updateABI = async () => {
