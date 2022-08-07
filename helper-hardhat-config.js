@@ -4,7 +4,7 @@ const networkConfig = {
   4: {
     name: "rinkeby",
     goal: ethers.utils.parseEther("3.0"),
-    percentCut:"300"
+    percentCut:"300",
   },
 
   31337: {
