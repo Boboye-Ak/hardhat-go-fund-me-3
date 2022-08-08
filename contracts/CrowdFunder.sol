@@ -113,6 +113,11 @@ contract CrowdFunder {
         return id;
     }
 
+    function getCauseIdByCauseAddress(address causeAddress) public view returns (uint256) {
+        uint256 id = causeToId[causeAddress];
+        return id;
+    }
+
     function getMyCause() public view returns (uint256, address) {
         address causeAddress = getCauseAddressByOwnerWallet(msg.sender);
         uint256 causeId = hasCause[msg.sender];
