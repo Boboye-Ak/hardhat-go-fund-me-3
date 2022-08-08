@@ -28,8 +28,6 @@ const updateABI = async () => {
     let crowdFunderABI = (await hre.artifacts.readArtifact("CrowdFunder")).abi
     causeABI = { abi: causeABI }
     crowdFunderABI = { abi: crowdFunderABI }
-    console.log(causeABI)
-    console.log(crowdFunderABI)
     fs.writeFileSync(CAUSE_ABI_FILE, JSON.stringify(causeABI))
     fs.writeFileSync(CROWD_FUNDER_ABI_FILE, JSON.stringify(crowdFunderABI))
 }

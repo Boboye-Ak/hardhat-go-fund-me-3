@@ -108,8 +108,7 @@ contract CrowdFunder {
     }
 
     function getCauseIdByOwnerWallet(address owner) public view returns (uint256) {
-        address causeAddress = walletToCauseOwned[owner];
-        uint256 id = hasCause[causeAddress];
+        uint256 id = hasCause[owner];
         return id;
     }
 
