@@ -107,20 +107,19 @@ contract CrowdFunder {
         return causeAddress;
     }
 
-    function getCauseIdByOwnerWallet(address owner) public view returns (uint256) {
-        uint256 id = hasCause[owner];
-        return id;
+    function getCauseIdByOwnerAddress(address owner) public view returns (uint256) {
+        uint256 causeId = hasCause[owner];
+        return causeId;
     }
 
     function getCauseIdByCauseAddress(address causeAddress) public view returns (uint256) {
-        uint256 id = causeToId[causeAddress];
-        return id;
+        uint256 causeId = causeToId[causeAddress];
+        return causeId;
     }
 
-    function getMyCause() public view returns (uint256, address) {
-        address causeAddress = getCauseAddressByOwnerWallet(msg.sender);
+    function getMyCauseId() public view returns (uint256) {
         uint256 causeId = hasCause[msg.sender];
-        return (causeId, causeAddress);
+        return (causeId);
     }
 
     function getLatestCauseAddress() public view returns (address) {

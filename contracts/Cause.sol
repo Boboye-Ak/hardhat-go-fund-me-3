@@ -222,4 +222,10 @@ contract Cause {
     function getCauseURI() public view returns (string memory) {
         return s_causeURI;
     }
+    function getIsWithdrawn() public view returns (bool){
+        return s_isWithdrawn;
+    }
+    function getIsLocked() public view returns (bool){
+        return s_isBlocked;
+    }
 }

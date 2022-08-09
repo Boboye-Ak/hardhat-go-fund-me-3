@@ -25,6 +25,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 
 const RINKEBY_RPC_URL = process.env.RINKEBY_RPC_URL
 const PRIVATE_KEY = process.env.PRIVATE_KEY
+const LOCALHOST_RPC_URL = process.env.LOCALHOST_RPC_URL
 module.exports = {
     solidity: "0.8.7",
     networks: {
@@ -42,6 +43,10 @@ module.exports = {
             blockConfirmations: 6,
             url: RINKEBY_RPC_URL,
             accounts: [PRIVATE_KEY],
+        },
+        localhost: {
+            url: LOCALHOST_RPC_URL,
+            chainId: 31337,
         },
     },
     gasReporter: {

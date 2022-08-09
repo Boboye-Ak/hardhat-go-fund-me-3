@@ -7,6 +7,7 @@ module.exports = async (hre) => {
     const { deployer } = await getNamedAccounts()
     const { deploy, log } = deployments
     const chainId = network.config.chainId
+    console.log(chainId)
     const signers = await ethers.getSigners()
     const causeOwner = signers[1]
     const crowdFunder = await ethers.getContract("CrowdFunder")
