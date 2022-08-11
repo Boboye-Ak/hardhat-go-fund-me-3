@@ -228,4 +228,8 @@ contract Cause {
     function getIsLocked() public view returns (bool){
         return s_isBlocked;
     }
+    function getMyDonation() public view returns (uint256){
+        uint256 donationAmount=donorToAmountDonated[msg.sender];
+        return donationAmount;
+    }
 }
