@@ -190,7 +190,11 @@ contract Cause {
         s_causeBalance = s_causeBalance - amount;
         if (s_causeBalance < i_goal) {
             s_isGoalReached = false;
+            if (!s_isWithdrawn && !s_isBlocked) {
+                s_isOpenToDonations = true;
+            }
         }
+
         emit Refunded(msg.sender, amount);
     }
 
@@ -222,14 +226,17 @@ contract Cause {
     function getCauseURI() public view returns (string memory) {
         return s_causeURI;
     }
-    function getIsWithdrawn() public view returns (bool){
+
+    function getIsWithdrawn() public view returns (bool) {
         return s_isWithdrawn;
     }
-    function getIsLocked() public view returns (bool){
+
+    function getIsLocked() public view returns (bool) {
         return s_isBlocked;
     }
-    function getMyDonation() public view returns (uint256){
-        uint256 donationAmount=donorToAmountDonated[msg.sender];
+
+    function getMyDonation() public view returns (uint256) {
+        uint256 donationAmount = donorToAmountDonated[msg.sender];
         return donationAmount;
     }
 }
