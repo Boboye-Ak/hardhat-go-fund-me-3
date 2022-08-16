@@ -96,6 +96,16 @@ contract CrowdFunder {
         cause.unlock();
     }
 
+    //Handover Function
+
+    function handover(address newOwner) public {
+        require((hasCause[msg.sender] != 0) && (hasCause[newOwner] == 0));
+        hasCause[newOwner] = hasCause[msg.sender];
+        hasCause[msg.sender] = 0;
+        walletToCauseOwned[newOwner] = walletToCauseOwned[msg.sender];
+        walletToCauseOwned[msg.sender] = address(0);
+    }
+
     //VIEW FUNCTIONS
     function getCauseById(uint256 causeId) public view returns (address) {
         address causeAddress = address(s_causes[causeId - 1]);

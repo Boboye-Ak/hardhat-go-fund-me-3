@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 
+
+
 contract Cause {
     //State Variables
     uint256 public s_causeBalance;
