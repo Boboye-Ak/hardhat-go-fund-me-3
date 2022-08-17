@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 
-
-
 contract Cause {
     //State Variables
     uint256 public s_causeBalance;
@@ -240,5 +238,10 @@ contract Cause {
     function getMyDonation() public view returns (uint256) {
         uint256 donationAmount = donorToAmountDonated[msg.sender];
         return donationAmount;
+    }
+
+    function getNumDonations() public view returns (uint256) {
+        uint256 numDonations = donorList.length;
+        return numDonations;
     }
 }
