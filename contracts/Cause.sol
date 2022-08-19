@@ -2,6 +2,12 @@
 pragma solidity ^0.8.7;
 
 contract Cause {
+    //Type Declarations
+    struct donation {
+        address donor;
+        uint256 amount;
+    }
+
     //State Variables
     uint256 public s_causeBalance;
     uint256 public immutable i_goal;
@@ -16,7 +22,7 @@ contract Cause {
     string public s_causeName;
     string public s_causeURI;
     mapping(address => uint256) public donorToAmountDonated;
-    address[] public donorList;
+    donation[] public donationList;
 
     //Custom Errors
     error Cause__IsNotOpenToDonations();
@@ -96,7 +102,8 @@ contract Cause {
         }
 
         s_causeBalance += msg.value;
-        donorList.push(msg.sender);
+        donation memory newDonation = donation(msg.sender, msg.value);
+        donationList.push(newDonation);
         donorToAmountDonated[msg.sender] += msg.value;
         if (s_causeBalance >= i_goal) {
             s_isGoalReached = true;
@@ -241,7 +248,11 @@ contract Cause {
     }
 
     function getNumDonations() public view returns (uint256) {
-        uint256 numDonations = donorList.length;
+        uint256 numDonations = donationList.length;
         return numDonations;
+    }
+
+    function getDonationList() public view returns (donation[] memory) {
+        return donationList;
     }
 }
