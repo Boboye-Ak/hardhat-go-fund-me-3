@@ -13,6 +13,7 @@ contract Cause {
     uint256 public immutable i_goal;
     uint256 public immutable i_percentCut;
     uint256 public immutable i_causeId;
+    uint256 public s_numRefunds;
     bool public s_isGoalReached;
     bool public s_isOpenToDonations;
     bool public s_isBlocked;
@@ -77,6 +78,7 @@ contract Cause {
         i_percentCut = percentCut;
         i_causeId = causeId;
         s_isBlocked = true;
+        s_numRefunds = 0;
     }
 
     //Receive and Fallback Functions
@@ -196,6 +198,7 @@ contract Cause {
         donation memory newDonation = donation(msg.sender, -int256(amount));
         donationList.push(newDonation);
         donorToAmountDonated[msg.sender] = 0;
+        s_numRefunds = s_numRefunds + 1;
         s_causeBalance = s_causeBalance - amount;
         if (s_causeBalance < i_goal) {
             s_isGoalReached = false;
@@ -256,5 +259,9 @@ contract Cause {
 
     function getDonationList() public view returns (donation[] memory) {
         return donationList;
+    }
+
+    function getNumRefunds() public view returns (uint256) {
+        return s_numRefunds;
     }
 }
