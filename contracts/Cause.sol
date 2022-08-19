@@ -5,7 +5,7 @@ contract Cause {
     //Type Declarations
     struct donation {
         address donor;
-        uint256 amount;
+        int256 amount;
     }
 
     //State Variables
@@ -102,7 +102,7 @@ contract Cause {
         }
 
         s_causeBalance += msg.value;
-        donation memory newDonation = donation(msg.sender, msg.value);
+        donation memory newDonation = donation(msg.sender, int256(msg.value));
         donationList.push(newDonation);
         donorToAmountDonated[msg.sender] += msg.value;
         if (s_causeBalance >= i_goal) {
@@ -193,6 +193,8 @@ contract Cause {
         if (!success) {
             revert Cause__ErrorWithdrawing();
         }
+        donation memory newDonation = donation(msg.sender, -int256(amount));
+        donationList.push(newDonation);
         donorToAmountDonated[msg.sender] = 0;
         s_causeBalance = s_causeBalance - amount;
         if (s_causeBalance < i_goal) {
