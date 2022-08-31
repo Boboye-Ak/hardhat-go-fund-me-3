@@ -137,6 +137,11 @@ contract CrowdFunder {
         return latestCauseAddress;
     }
 
+    function getLatestCauseId() public view returns (uint256) {
+        uint256 latestCauseId = s_nextCauseId - 1;
+        return latestCauseId;
+    }
+
     function getContractBalance() public view returns (uint256) {
         return address(this).balance;
     }
