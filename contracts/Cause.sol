@@ -191,13 +191,14 @@ contract Cause {
             revert Cause__YouDoNotHaveAnyDonationToThisCause();
         }
         uint256 amount = donorToAmountDonated[msg.sender];
+        donorToAmountDonated[msg.sender] = 0;
         bool success = payable(msg.sender).send(amount);
         if (!success) {
             revert Cause__ErrorWithdrawing();
         }
         donation memory newDonation = donation(msg.sender, -int256(amount));
         donationList.push(newDonation);
-        donorToAmountDonated[msg.sender] = 0;
+
         s_numRefunds = s_numRefunds + 1;
         s_causeBalance = s_causeBalance - amount;
         if (s_causeBalance < i_goal) {
