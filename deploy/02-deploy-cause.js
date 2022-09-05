@@ -26,12 +26,20 @@ module.exports = async (hre) => {
     const transactionResponse = await causeOwnerCrowdFunder.createCause(causeName, goal)
     const transactionReceipt = await transactionResponse.wait(1)
     const latestCause = await causeOwnerCrowdFunder.getLatestCauseAddress()
-    log(`New Cause deployed at ${latestCause} with ${transactionReceipt.gasUsed} gas used from ${causeOwner.address}`)
+    log(
+        `New Cause deployed at ${latestCause} with ${transactionReceipt.gasUsed} gas used from ${causeOwner.address}`
+    )
 
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
         console.log("Verifying...")
         await verify(latestCause, constructorArgs)
     }
+    const causeABI = (await hre.artifacts.readArtifact("Cause")).abi
+
+    const latestCauseContract = new ethers.Contract(latestCause, causeABI, causeOwner)
+    await latestCauseContract.setCauseURI(
+        "https://gateway.pinata.cloud/ipfs/QmNQo4nRyPgNzCJwix6N1FGwiEKBnU2V7H8AtSex5Ahid5"
+    )
     log("----------------------------- ")
 }
 
