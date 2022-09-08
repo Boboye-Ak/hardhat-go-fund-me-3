@@ -42,11 +42,11 @@ contract CrowdFunder {
 
     //RECEIVE AND FALLBACK FUNCTIONS
     receive() external payable {
-        emit DonationReceived(msg.value);
+        sponsorSite();
     }
 
     fallback() external payable {
-        emit DonationReceived(msg.value);
+        sponsorSite();
     }
 
     //PURE FUNCTIONS

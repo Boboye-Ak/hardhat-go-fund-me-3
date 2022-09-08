@@ -59,6 +59,7 @@ module.exports = {
     namedAccounts: {
         deployer: {
             default: 0,
+            rinkeby: 0,
         },
         fraud: {
             default: 3,

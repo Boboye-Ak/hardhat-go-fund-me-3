@@ -12,7 +12,7 @@ module.exports = async (hre) => {
     const causeOwner = signers[1]
     const crowdFunder = await ethers.getContract("CrowdFunder")
     const causeOwnerCrowdFunder = await crowdFunder.connect(causeOwner)
-    const causeName = "My Cause Name"
+    const causeName = "Dummy Cause Name"
     const goal = networkConfig[chainId]["goal"]
     const causeId = await causeOwnerCrowdFunder.s_nextCauseId()
     constructorArgs = [

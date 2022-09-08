@@ -102,6 +102,9 @@ contract Cause {
         if (s_isBlocked) {
             revert Cause__IsBlocked();
         }
+        if (s_isWithdrawn) {
+            revert();
+        }
 
         s_causeBalance += msg.value;
         donation memory newDonation = donation(msg.sender, int256(msg.value));
@@ -109,7 +112,6 @@ contract Cause {
         donorToAmountDonated[msg.sender] += msg.value;
         if (s_causeBalance >= i_goal) {
             s_isGoalReached = true;
-            s_isOpenToDonations = false;
         }
         emit DonationMade(msg.sender, msg.value);
     }
@@ -129,7 +131,6 @@ contract Cause {
         if (!withdrawalSuccess) {
             revert Cause__ErrorWithdrawing();
         } else {
-            s_isOpenToDonations = false;
             s_causeBalance = 0;
             s_isWithdrawn = true;
             emit WithdrawalMade(msg.sender, amount);
@@ -148,11 +149,7 @@ contract Cause {
         if (s_isOpenToDonations) {
             s_isOpenToDonations = false;
         } else {
-            if (s_isWithdrawn) {
-                revert Cause__CannotOpenToDonationsAfterWithdrawal();
-            } else {
-                s_isOpenToDonations = true;
-            }
+            s_isOpenToDonations = true;
         }
         emit IsOpenToDonationsSwitched(s_isOpenToDonations);
     }
@@ -203,9 +200,6 @@ contract Cause {
         s_causeBalance = s_causeBalance - amount;
         if (s_causeBalance < i_goal) {
             s_isGoalReached = false;
-            if (!s_isWithdrawn && !s_isBlocked) {
-                s_isOpenToDonations = true;
-            }
         }
 
         emit Refunded(msg.sender, amount);
