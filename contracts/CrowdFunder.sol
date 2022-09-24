@@ -14,8 +14,8 @@ contract CrowdFunder {
     Cause[] public s_causes;
 
     //CUSTOM ERRORS
-    error CrowdFunder__OnlyOwnerCanCallThis();
-    error CrowdFunder__ThisWalletAlreadyHasACause();
+    error CrowdFunder__Unauthorised();
+    error CrowdFunder__AlreadyHasACause();
     error CrowdFunder__ErrorWithdrawing();
 
     //EVENTS
@@ -26,7 +26,7 @@ contract CrowdFunder {
     //MODIFIERS
     modifier onlyOwner() {
         if (msg.sender != i_crowdFunderOwner) {
-            revert CrowdFunder__OnlyOwnerCanCallThis();
+            revert CrowdFunder__Unauthorised();
         }
         _;
     }
@@ -53,7 +53,7 @@ contract CrowdFunder {
     //Create Cause Function
     function createCause(string memory causeName, uint256 goal) public returns (address) {
         if (hasCause[msg.sender] != 0) {
-            revert CrowdFunder__ThisWalletAlreadyHasACause();
+            revert CrowdFunder__AlreadyHasACause();
         }
         Cause newCause = new Cause(
             causeName,

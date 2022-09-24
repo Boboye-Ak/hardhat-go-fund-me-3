@@ -27,16 +27,11 @@ contract Cause {
 
     //Custom Errors
     error Cause__IsNotOpenToDonations();
-    error Cause__GoalAlreadyReached();
-    error Cause__OnlyCauseOwnerCanCall();
+    error Cause__CannotInCurrentState();
+    error Cause__NotAuthorized();
     error Cause__ErrorWithdrawing();
-    error Cause__CannotOpenToDonationsAfterWithdrawal();
-    error Cause__IsBlocked();
-    error Cause__IsBlockedAlready();
-    error Cause__IsUnblockedAlready();
-    error Cause__OnlyCreatorContractCanCall();
-    error Cause__CauseOwnerHasWithdrawnAlready();
-    error Cause__YouDoNotHaveAnyDonationToThisCause();
+    error Cause__AlreadyInState();
+    error Cause__YouDoNotHaveADonation();
 
     //Events
     event DonationMade(address indexed donor, uint256 amount);
@@ -50,14 +45,14 @@ contract Cause {
 
     modifier onlyOwner() {
         if (msg.sender != s_causeOwner) {
-            revert Cause__OnlyCauseOwnerCanCall();
+            revert Cause__NotAuthorized();
         }
         _;
     }
 
     modifier onlyParentContract() {
         if (msg.sender != s_causeCreatorContract) {
-            revert Cause__OnlyCreatorContractCanCall();
+            revert Cause__NotAuthorized();
         }
         _;
     }
@@ -94,16 +89,16 @@ contract Cause {
     //Donate Function
     function donate() public payable {
         if (s_isGoalReached) {
-            revert Cause__GoalAlreadyReached();
+            revert Cause__CannotInCurrentState();
         }
         if (!s_isOpenToDonations) {
-            revert Cause__IsNotOpenToDonations();
+            revert Cause__CannotInCurrentState();
         }
         if (s_isBlocked) {
-            revert Cause__IsBlocked();
+            revert Cause__CannotInCurrentState();
         }
         if (s_isWithdrawn) {
-            revert();
+            revert Cause__CannotInCurrentState();
         }
 
         s_causeBalance += msg.value;
@@ -119,8 +114,10 @@ contract Cause {
     //Withdraw Function
     function withdraw() public onlyOwner {
         if (s_isBlocked) {
-            revert Cause__IsBlocked();
+            revert Cause__CannotInCurrentState();
         }
+        s_causeBalance = 0;
+        s_isWithdrawn = true;
         uint256 amount = address(this).balance;
         uint256 parentContractCut = ((amount * i_percentCut) / 10000);
         bool paymentToParentSuccess = payable(s_causeCreatorContract).send(parentContractCut);
@@ -131,15 +128,13 @@ contract Cause {
         if (!withdrawalSuccess) {
             revert Cause__ErrorWithdrawing();
         } else {
-            s_causeBalance = 0;
-            s_isWithdrawn = true;
             emit WithdrawalMade(msg.sender, amount);
         }
     }
 
     function changeOwnership(address payable newOwner) public onlyOwner {
         if (s_isBlocked) {
-            revert Cause__IsBlocked();
+            revert Cause__CannotInCurrentState();
         }
         s_causeOwner = newOwner;
         emit OwnershipChanged(newOwner);
@@ -158,7 +153,7 @@ contract Cause {
         string memory causeURI /* Will be the URI of an IPFS Json file  */
     ) public onlyOwner {
         if (s_isBlocked) {
-            revert Cause__IsBlocked();
+            revert Cause__CannotInCurrentState();
         }
         s_causeURI = causeURI;
         emit CauseURISet(s_causeURI);
@@ -166,7 +161,7 @@ contract Cause {
 
     function lock() public onlyParentContract {
         if (s_isBlocked) {
-            revert Cause__IsBlockedAlready();
+            revert Cause__AlreadyInState();
         }
         s_isBlocked = true;
         emit CauseLocked(s_isBlocked);
@@ -174,7 +169,7 @@ contract Cause {
 
     function unlock() public onlyParentContract {
         if (!s_isBlocked) {
-            revert Cause__IsUnblockedAlready();
+            revert Cause__AlreadyInState();
         }
         s_isBlocked = false;
         emit CauseUnlocked(s_isBlocked);
@@ -182,12 +177,17 @@ contract Cause {
 
     function demandRefund() public payable {
         if (s_isWithdrawn) {
-            revert Cause__CauseOwnerHasWithdrawnAlready();
+            revert Cause__CannotInCurrentState();
         }
         if (donorToAmountDonated[msg.sender] == 0) {
-            revert Cause__YouDoNotHaveAnyDonationToThisCause();
+            revert Cause__YouDoNotHaveADonation();
         }
-        uint256 amount = donorToAmountDonated[msg.sender];
+               uint256 amount = donorToAmountDonated[msg.sender];
+        s_numRefunds = s_numRefunds + 1;
+        s_causeBalance = s_causeBalance - amount;
+        if (s_causeBalance < i_goal) {
+            s_isGoalReached = false;
+        }
         donorToAmountDonated[msg.sender] = 0;
         bool success = payable(msg.sender).send(amount);
         if (!success) {
@@ -195,12 +195,6 @@ contract Cause {
         }
         donation memory newDonation = donation(msg.sender, -int256(amount));
         donationList.push(newDonation);
-
-        s_numRefunds = s_numRefunds + 1;
-        s_causeBalance = s_causeBalance - amount;
-        if (s_causeBalance < i_goal) {
-            s_isGoalReached = false;
-        }
 
         emit Refunded(msg.sender, amount);
     }
