@@ -182,7 +182,7 @@ contract Cause {
         if (donorToAmountDonated[msg.sender] == 0) {
             revert Cause__YouDoNotHaveADonation();
         }
-               uint256 amount = donorToAmountDonated[msg.sender];
+        uint256 amount = donorToAmountDonated[msg.sender];
         s_numRefunds = s_numRefunds + 1;
         s_causeBalance = s_causeBalance - amount;
         if (s_causeBalance < i_goal) {

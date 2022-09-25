@@ -1,10 +1,12 @@
-# Advanced Sample Hardhat Project
+# WEB3 CROWDFUNDING APP PROJECT
 
-This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
+This is a hardhat project for the backend of a crowdfunding DApp built mainly for the ethereum blockchain but can be modified for any EVM compatible blockchains such as Polygon.
 
-The project comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts. It also comes with a variety of other tools, preconfigured to work with the project code.
-
-Try running some of the following tasks:
+The Project comprises of two smart contracts. Cause.sol and CrowdFunder.sol written in solidity version 0.8.7. The CrowdFunder contract controls the dapp and can deploy cause contracts which will control individual causes.
+## CrowdFunder.sol
+The Crowdfunder contract controls the operations of the dapp and deploys the cause contracts.
+### CrowdFunder.sol Functions
+1. createCause=> To be called by the prospective cause owner to create a cause. It takes a string and an integer as arguments.
 
 ```shell
 npx hardhat accounts
