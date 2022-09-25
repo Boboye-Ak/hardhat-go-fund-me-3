@@ -6,7 +6,7 @@ The Project comprises of two smart contracts. Cause.sol and CrowdFunder.sol writ
 ## CrowdFunder.sol
 The Crowdfunder contract controls the operations of the dapp and deploys the cause contracts.
 ### CrowdFunder.sol Functions
-1. createCause=> To be called by the prospective cause owner to create a cause. It takes a string and an integer as arguments.
+1. createCause=> To be called by the prospective cause owner to create a cause. It takes a string(causeName) and an integer(goal) as arguments.
 
 ```shell
 npx hardhat accounts

@@ -35,9 +35,7 @@ const { deploy, log } = deployments
                   causeABI = (await hre.artifacts.readArtifact("Cause")).abi
               })
               it("doesn't allow multiple cause creation by same wallet", async () => {
-                  await expect(signerCrowdFunder.createCause(causeName, goal)).to.be.revertedWith(
-                      "CrowdFunder__ThisWalletAlreadyHasACause"
-                  )
+                  await expect(signerCrowdFunder.createCause(causeName, goal)).to.be.reverted
               })
               it("Initializes cause contract properly", async () => {
                   //get latest cause contract
@@ -78,9 +76,7 @@ const { deploy, log } = deployments
               it("only allows the owner of the contract to call it", async () => {
                   const attacker = (await ethers.getSigners())[1]
                   const attackerCrowdFunder = await crowdFunder.connect(attacker)
-                  await expect(attackerCrowdFunder.withdraw()).to.be.revertedWith(
-                      "CrowdFunder__OnlyOwnerCanCallThis"
-                  )
+                  await expect(attackerCrowdFunder.withdraw()).to.be.reverted
               })
               it("pays the balance of the contract to the owner", async () => {
                   const initialDeployerBalance = await crowdFunder.provider.getBalance(deployer)
@@ -113,12 +109,8 @@ const { deploy, log } = deployments
                   latestCause = new ethers.Contract(latestCauseAddress, causeABI, signer)
               })
               it("doesn't allow nonOwner addresses lock or unlock", async () => {
-                  await expect(signerCrowdFunder.lock(1)).to.be.revertedWith(
-                      "CrowdFunder__OnlyOwnerCanCallThis"
-                  )
-                  await expect(signerCrowdFunder.unlock(1)).to.be.revertedWith(
-                      "CrowdFunder__OnlyOwnerCanCallThis"
-                  )
+                  await expect(signerCrowdFunder.lock(1)).to.be.reverted
+                  await expect(signerCrowdFunder.unlock(1)).to.be.reverted
               })
               it("locks a selected cause when called", async () => {
                   await crowdFunder.lock(1)
@@ -158,7 +150,7 @@ const { deploy, log } = deployments
                   )
               })
               it("gets cause address based on the sender address", async () => {
-                  assert(await signerCrowdFunder.getMyCause(), latestCauseAddress)
+                  assert(await signerCrowdFunder.getMyCauseId(), latestCauseAddress)
               })
               it("gets contract balance correctly", async () => {
                   await crowdFunder.sponsorSite({

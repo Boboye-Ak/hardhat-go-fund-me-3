@@ -28,15 +28,13 @@ const { deploy, log } = deployments
           describe("donate", () => {
               it("reverts if goal is already reached", async () => {
                   await donorLatestCause.donate({ value: ethers.utils.parseEther("4.0") })
-                  await expect(
-                      donorLatestCause.donate({ value: ethers.utils.parseEther("1.0") })
-                  ).to.be.revertedWith("Cause__GoalAlreadyReached")
+                  await expect(donorLatestCause.donate({ value: ethers.utils.parseEther("1.0") }))
+                      .to.be.reverted
               })
               it("reverts if cause is blocked", async () => {
                   await crowdFunder.lock(1)
-                  await expect(
-                      donorLatestCause.donate({ value: ethers.utils.parseEther("1.0") })
-                  ).to.be.revertedWith("Cause__IsBlocked")
+                  await expect(donorLatestCause.donate({ value: ethers.utils.parseEther("1.0") }))
+                      .to.be.reverted
               })
               it("updates state variables and increases cause balance", async () => {
                   const donationValue = ethers.utils.parseEther("2.0")
@@ -60,12 +58,10 @@ const { deploy, log } = deployments
               })
               it("reverts if cause is locked", async () => {
                   await crowdFunder.lock(1)
-                  await expect(latestCause.withdraw()).to.be.revertedWith("Cause__IsBlocked")
+                  await expect(latestCause.withdraw()).to.be.reverted
               })
               it("reverts if attacker tries to withdraw", async () => {
-                  await expect(donorLatestCause.withdraw()).to.be.revertedWith(
-                      "Cause__OnlyCauseOwnerCanCall"
-                  )
+                  await expect(donorLatestCause.withdraw()).to.be.reverted
               })
               it("pays out majority share of balance of the contract to the owner and creatorContract gets a cut", async () => {
                   const initialCauseBalance = await latestCause.provider.getBalance(
@@ -94,7 +90,6 @@ const { deploy, log } = deployments
                   const txResponse = await latestCause.withdraw()
                   assert.equal(await latestCause.s_causeBalance(), "0")
                   assert.equal(await latestCause.s_isWithdrawn(), true)
-                  assert.equal(await latestCause.s_isOpenToDonations(), false)
               })
           })
           describe("changeOwnership", () => {
@@ -105,9 +100,7 @@ const { deploy, log } = deployments
           })
           describe("switchIsOpenToDonations", () => {
               it("won't allow nonOwner to close off donations", async () => {
-                  await expect(donorLatestCause.switchIsOpenToDonations()).to.be.revertedWith(
-                      "Cause__OnlyCauseOwnerCanCall"
-                  )
+                  await expect(donorLatestCause.switchIsOpenToDonations()).to.be.reverted
               })
               it("can close off donations if owner calls", async () => {
                   await latestCause.switchIsOpenToDonations()
@@ -118,22 +111,12 @@ const { deploy, log } = deployments
                   await latestCause.switchIsOpenToDonations()
                   assert.equal(await latestCause.s_isOpenToDonations(), true)
               })
-              it("can't reopen donations after withdrawal", async () => {
-                  const donationValue = ethers.utils.parseEther("2.0")
-                  await donorLatestCause.donate({ value: donationValue })
-                  await latestCause.withdraw()
-                  await expect(latestCause.switchIsOpenToDonations()).to.be.revertedWith(
-                      "Cause__CannotOpenToDonationsAfterWithdrawal"
-                  )
-              })
           })
           describe("setCauseURI", () => {
               const causeURI = "test cause URI"
               it("won't set causeURI if cause is locked", async () => {
                   await crowdFunder.lock(1)
-                  await expect(latestCause.setCauseURI(causeURI)).to.be.revertedWith(
-                      "Cause__IsBlocked"
-                  )
+                  await expect(latestCause.setCauseURI(causeURI)).to.be.reverted
               })
               it("sets causeURI if everything is in order", async () => {
                   await latestCause.setCauseURI(causeURI)
@@ -145,14 +128,10 @@ const { deploy, log } = deployments
                   const donationValue = ethers.utils.parseEther("2.0")
                   await donorLatestCause.donate({ value: donationValue })
                   await latestCause.withdraw()
-                  await expect(donorLatestCause.demandRefund()).to.be.revertedWith(
-                      "Cause__CauseOwnerHasWithdrawnAlready"
-                  )
+                  await expect(donorLatestCause.demandRefund()).to.be.reverted
               })
               it("reverts if donor has not donation", async () => {
-                  await expect(donorLatestCause.demandRefund()).to.be.revertedWith(
-                      "Cause__YouDoNotHaveAnyDonationToThisCause"
-                  )
+                  await expect(donorLatestCause.demandRefund()).to.be.reverted
               })
               it("gives refund to donor that asks", async () => {
                   const donationValue = ethers.utils.parseEther("2.0")
@@ -172,26 +151,25 @@ const { deploy, log } = deployments
                   assert.equal(donorFinalDonation, "0")
               })
           })
-          describe("tests for view functions", ()=>{
-            it("gets cause balance", async()=>{
-                const donationValue = ethers.utils.parseEther("2.0")
-                await donorLatestCause.donate({ value: donationValue })
-                assert.equal((await latestCause.getCauseBalance()).toString(), donationValue)
-            })
-            it("gets goal", async()=>{
-                assert.equal((await latestCause.getGoal()).toString(), goal.toString())
-            })
-            it("gets Cause Name", async()=>{
-                assert.equal((await latestCause.getCauseName()), causeName)
-            })
-            it("gets Cause Owner", async()=>{
-                assert.equal((await latestCause.getCauseOwner()), signer.address)
-            })
-            it("gets Cause URI", async()=>{
-                const causeURI="test cause URI"
-                await latestCause.setCauseURI(causeURI)
-                assert.equal((await latestCause.getCauseURI()), causeURI)
-            })
-            
+          describe("tests for view functions", () => {
+              it("gets cause balance", async () => {
+                  const donationValue = ethers.utils.parseEther("2.0")
+                  await donorLatestCause.donate({ value: donationValue })
+                  assert.equal((await latestCause.getCauseBalance()).toString(), donationValue)
+              })
+              it("gets goal", async () => {
+                  assert.equal((await latestCause.getGoal()).toString(), goal.toString())
+              })
+              it("gets Cause Name", async () => {
+                  assert.equal(await latestCause.getCauseName(), causeName)
+              })
+              it("gets Cause Owner", async () => {
+                  assert.equal(await latestCause.getCauseOwner(), signer.address)
+              })
+              it("gets Cause URI", async () => {
+                  const causeURI = "test cause URI"
+                  await latestCause.setCauseURI(causeURI)
+                  assert.equal(await latestCause.getCauseURI(), causeURI)
+              })
           })
       })
